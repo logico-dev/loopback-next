@@ -6,32 +6,57 @@
 import {belongsTo, Entity, model, property} from '@loopback/repository';
 import {TodoList, TodoListWithRelations} from './todo-list.model';
 
-@model()
+@model({
+  settings: {
+    mysql: {table: 'my_todo'},
+  },
+})
 export class Todo extends Entity {
   @property({
     type: 'number',
     id: true,
-    generated: false,
+    generated: true,
+    mysql: {
+      columnName: 'id',
+    },
   })
   id?: number;
 
   @property({
     type: 'string',
     required: true,
+    mysql: {
+      columnName: 'title',
+    },
   })
   title: string;
 
   @property({
     type: 'string',
+    mysql: {
+      columnName: 'desc',
+    },
   })
   desc?: string;
 
   @property({
     type: 'boolean',
+    mysql: {
+      columnName: 'is_complete',
+    },
   })
   isComplete?: boolean;
 
-  @belongsTo(() => TodoList)
+  @belongsTo(
+    () => TodoList,
+    {},
+    {
+      type: 'number',
+      mysql: {
+        columnName: 'todo_list_id',
+      },
+    },
+  )
   todoListId: number;
 
   constructor(data?: Partial<Todo>) {

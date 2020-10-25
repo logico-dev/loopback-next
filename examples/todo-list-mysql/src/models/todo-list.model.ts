@@ -9,23 +9,36 @@ import {
 } from './todo-list-image.model';
 import {Todo, TodoWithRelations} from './todo.model';
 
-@model()
+@model({
+  settings: {
+    mysql: {table: 'my_todo_list'},
+  },
+})
 export class TodoList extends Entity {
   @property({
     type: 'number',
     id: true,
-    generated: false,
+    generated: true,
+    mysql: {
+      columnName: 'id',
+    },
   })
   id?: number;
 
   @property({
     type: 'string',
     required: true,
+    mysql: {
+      columnName: 'title',
+    },
   })
   title: string;
 
   @property({
     type: 'string',
+    mysql: {
+      columnName: 'color',
+    },
   })
   color?: string;
 

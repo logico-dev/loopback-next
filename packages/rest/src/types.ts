@@ -171,7 +171,7 @@ export interface RequestBodyParserOptions extends Options {
   /**
    * Options for json parser
    */
-  json?: OptionsJson;
+  json?: OptionsJson & {prohibitedKeys?: string[]};
   /**
    * Options for urlencoded parser
    */

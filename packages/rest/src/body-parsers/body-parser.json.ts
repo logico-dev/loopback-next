@@ -7,15 +7,15 @@ import {inject} from '@loopback/core';
 import {json} from 'body-parser';
 import {is} from 'type-is';
 import {RestBindings} from '../keys';
+import {sanitizeJsonParse} from '../parse-json';
 import {Request, RequestBodyParserOptions} from '../types';
 import {
   BodyParserMiddleware,
+  builtinParsers,
   getParserOptions,
   invokeBodyParserMiddleware,
-  builtinParsers,
 } from './body-parser.helpers';
 import {BodyParser, RequestBody} from './types';
-import {sanitizeJsonParse} from '../parse-json';
 
 export class JsonBodyParser implements BodyParser {
   name = builtinParsers.json;
@@ -26,7 +26,10 @@ export class JsonBodyParser implements BodyParser {
     options: RequestBodyParserOptions = {},
   ) {
     const jsonOptions = getParserOptions('json', options);
-    jsonOptions.reviver = sanitizeJsonParse(jsonOptions.reviver);
+    jsonOptions.reviver = sanitizeJsonParse(
+      jsonOptions.reviver,
+      jsonOptions.prohibitedKeys,
+    );
     this.jsonParser = json(jsonOptions);
   }
 

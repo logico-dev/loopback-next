@@ -16,11 +16,35 @@
 /**
  * Factory to create a reviver function for `JSON.parse` to sanitize keys
  * @param reviver - Reviver function
+ * @param prohibitedKeys - An array of keys to be rejected
  */
-export function sanitizeJsonParse(reviver?: (key: any, value: any) => any) {
+export function sanitizeJsonParse(
+  reviver?: (key: any, value: any) => any,
+  prohibitedKeys?: string[],
+) {
+  prohibitedKeys = [
+    '__proto__',
+    'constructor.prototype',
+    ...(prohibitedKeys ?? []),
+  ];
   return (key: string, value: any) => {
-    if (key === '__proto__')
-      throw new Error('JSON string cannot contain "__proto__" key.');
+    if (key === '__proto__') {
+      // Reject `__proto__`
+      throw new Error(`JSON string cannot contain "${key}" key.`);
+    }
+    if (
+      key === 'constructor' &&
+      value != null &&
+      Object.prototype.hasOwnProperty.call(value, 'prototype')
+    ) {
+      // Reject `constructor.prototype`
+      throw new Error(
+        `JSON string cannot contain "constructor.prototype" key.`,
+      );
+    }
+    if (prohibitedKeys!.some(k => key === k || key.indexOf(`${k}.`) === 0)) {
+      throw new Error(`JSON string cannot contain "${key}" key.`);
+    }
     if (reviver) {
       return reviver(key, value);
     } else {
@@ -30,13 +54,15 @@ export function sanitizeJsonParse(reviver?: (key: any, value: any) => any) {
 }
 
 /**
- *
+ * Parse a json string that rejects prohibited keys
  * @param text - JSON string
  * @param reviver - Optional reviver function for `JSON.parse`
+ * @param prohibitedKeys - An array of keys to be rejected
  */
 export function parseJson(
   text: string,
   reviver?: (key: any, value: any) => any,
+  prohibitedKeys?: string[],
 ) {
-  return JSON.parse(text, sanitizeJsonParse(reviver));
+  return JSON.parse(text, sanitizeJsonParse(reviver, prohibitedKeys));
 }

@@ -79,7 +79,7 @@ export const DEFAULT_LIMIT = '1mb';
 export function getParserOptions(
   type: 'json',
   options: RequestBodyParserOptions,
-): OptionsJson;
+): OptionsJson & {prohibitedKeys?: string[]};
 export function getParserOptions(
   type: 'urlencoded',
   options: RequestBodyParserOptions,

@@ -14,10 +14,45 @@ describe('parseJson', () => {
     );
   });
 
+  it('throws for JSON text with __proto__.* key', () => {
+    const text = '{"x": "1", "__proto__.abc": {"y": 2}}';
+    expect(() => parseJson(text)).to.throw(
+      'JSON string cannot contain "__proto__.abc" key.',
+    );
+  });
+
+  it('throws for JSON text with constructor key', () => {
+    const text = '{"x": "1", "constructor": {"prototype": {"y": 2}}}';
+    expect(() => parseJson(text)).to.throw(
+      'JSON string cannot contain "constructor.prototype" key.',
+    );
+  });
+
+  it('throws for JSON text with constructor.prototype key', () => {
+    const text = '{"x": "1", "constructor.prototype": {"y": 2}}';
+    expect(() => parseJson(text)).to.throw(
+      'JSON string cannot contain "constructor.prototype" key.',
+    );
+  });
+
+  it('throws for JSON text with prohibited keys', () => {
+    const text = '{"x": "1", "bad": {"prototype": {"y": 2}}}';
+    expect(() => parseJson(text, undefined, ['bad'])).to.throw(
+      'JSON string cannot contain "bad" key.',
+    );
+  });
+
   it('throws for JSON text with deep __proto__ key', () => {
     const text = '{"x": "1", "y": {"__proto__": {"z": 2}}}';
     expect(() => parseJson(text)).to.throw(
       'JSON string cannot contain "__proto__" key.',
+    );
+  });
+
+  it('throws for JSON text with deep constructor.prototype key', () => {
+    const text = '{"x": "1", "y": {"constructor": {"prototype": {"z": 2}}}}';
+    expect(() => parseJson(text)).to.throw(
+      'JSON string cannot contain "constructor.prototype" key.',
     );
   });
 
